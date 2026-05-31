@@ -1,13 +1,26 @@
-#include <stdio.h>
+#define MEM_POOL_FOR_FIFO
+#include <stdint.h>
 #include <string.h>
-#include <stdlib.h>
 
 #include "ring_fifo.h"
-#include  "event_cb.h"
-#include "mem_pool.h"
 #include "critical.h"
+#include "../common/error_code.h"
 
 #define PAGE_SIZE 4096U
+
+static uint8_t fifo_buf[FIFO_BUF_TOTAL_SIZE];
+static RingFifoCb_t s_fifo_cb = NULL;
+
+static void RingFifo_TriggerCb(uint32_t event, uint32_t status, 
+                               void* data, uint32_t len) {
+    if (s_fifo_cb != NULL) {
+        s_fifo_cb(event, status, data, len);
+    }
+}
+
+void RingFifo_SetCb(RingFifoCb_t cb) {
+    s_fifo_cb = cb;
+}
 
 //安全锁函数声明
 // 上锁
@@ -17,47 +30,75 @@ static void RingFifo_Lock(const RingFifo_t *fifo);
 static void RingFifo_UnLock(const RingFifo_t *fifo);
 
 // 静态FIFO初始化(外部提供数组)
-EventCb_Type RingFifo_StaticInit(RingFifo_t *fifo, uint8_t *buf,
+EventCb_Type RingFifo_StaticInit(RingFifo_t *fifo, const uint8_t *buf,
                                  uint32_t cap, uint32_t elem_size) {
     if (fifo == NULL || buf == NULL || cap == 0 || elem_size == 0) {
-        return FIFO_ERR_PARAM;
+        RingFifo_TriggerCb(
+                EVENT_FIFO_INIT_FAILED,
+                PARA_INVALID,
+                NULL,
+                0
+        );
+        return EVENT_FIFO_INIT_FAILED;
     }
     memset(fifo, 0, sizeof(RingFifo_t));
-    fifo->buf = buf;
-    fifo->capacity = cap;
-    fifo->elem_size = elem_size;
+    fifo->buf = fifo_buf;
+    fifo->capacity = FIFO_BUF_CAPACITY;
+    fifo->elem_size = FIFO_ELEMENT_SIZE;
     fifo->wr_idx = 0;
     fifo->rd_idx = 0;
-    fifo->is_dynamic = false;
-    return FIFO_OK;
+    fifo->is_dynamic = FALSE;
+    RingFifo_TriggerCb(
+            EVENT_FIFO_INIT_SUCCESS,
+            OPERATE_SUCCESS,
+            fifo,
+            sizeof(RingFifo_t)
+    );
+    return EVENT_FIFO_INIT_SUCCESS;
 }
 
 // 动态FIFO初始化(内部自动申请内存)
-EventCb_Type RingFifo_DynamicInit(RingFifo_t *fifo,mem_pool_t *pool,
+EventCb_Type RingFifo_DynamicInit(RingFifo_t *fifo, mem_pool_t *pool,
                                   uint32_t cap, uint32_t elem_size) {
-    if (fifo == NULL || cap == 0 || elem_size == 0) {
-        return FIFO_ERR_PARAM;
+    if (fifo == NULL || pool == NULL || cap == 0 || elem_size == 0) {
+        RingFifo_TriggerCb(
+                EVENT_FIFO_INIT_FAILED,
+                PARA_INVALID,
+                NULL,
+                0
+        );
+        return EVENT_FIFO_INIT_FAILED;
     }
     memset(fifo, 0, sizeof(RingFifo_t));
     fifo->capacity = cap;
     fifo->elem_size = elem_size;
-    uint32_t total_bytes = fifo->capacity * fifo->elem_size;
-    if (total_bytes > PAGE_SIZE) {
-        return FIFO_ERR_PARAM;
+    fifo->buf = mem_pool_alloc_page(pool, PAGE_SIZE);
+    if (fifo->buf == NULL) {
+        RingFifo_TriggerCb(
+                EVENT_FIFO_INIT_FAILED,
+                MEM_OVERFLOW,
+                NULL,
+                0
+        );
+        return EVENT_FIFO_INIT_FAILED;
     }
-    fifo->buf = mem_pool_alloc_continuous(pool, total_bytes);
-    if (fifo->buf == NULL) {return FIFO_ERR_MEM;}
     fifo->wr_idx = 0;
     fifo->rd_idx = 0;
 #if FIFO_USE_DATA_COUNT
     fifo->data_cnt = 0;
 #endif
-    fifo->is_dynamic = true;
-    return FIFO_OK;
+    fifo->is_dynamic = TRUE;
+    RingFifo_TriggerCb(
+            EVENT_FIFO_INIT_SUCCESS,
+            OPERATE_SUCCESS,
+            fifo,
+            sizeof(RingFifo_t)
+    );
+    return EVENT_FIFO_INIT_SUCCESS;
 }
 
 // 重置FIFO(不清内存,只复位指针计数)
-void RingFifo_Reset(RingFifo_t *fifo, bool clear_buf) {
+void RingFifo_Reset(RingFifo_t *fifo, bool_t clear_buf) {
     if (fifo == NULL) {return;}
     fifo->wr_idx = 0;
     fifo->rd_idx = 0;
@@ -65,36 +106,93 @@ void RingFifo_Reset(RingFifo_t *fifo, bool clear_buf) {
     fifo->data_cnt = 0;
 #endif
 #if FIFO_USE_LOCK_SAFE
-    fifo->lock_flag = false;
+    fifo->lock_flag = FALSE;
 #endif
-    if (clear_buf == true && fifo->buf != NULL)
+    if (clear_buf == TRUE && fifo->buf != NULL)
     {
         uint32_t total_bytes = fifo->capacity * fifo->elem_size;
         memset(fifo->buf, 0, total_bytes);
     }
+    RingFifo_TriggerCb(
+            EVENT_FIFO_RESET,
+            OPERATE_SUCCESS,
+            fifo,
+            sizeof(RingFifo_t)
+    );
 }
 
 // 销毁FIFO(释放动态内存)
 void RingFifo_DeInit(RingFifo_t *fifo, mem_pool_t *pool) {
+#if FIFO_USE_LOCK_SAFE
+    RingFifo_Lock(fifo);
+#endif
     // 1. 空指针校验
     if (fifo == NULL || pool == NULL)
     {
+        RingFifo_TriggerCb(
+                EVENT_FIFO_DEINIT,
+                PARA_INVALID,
+                NULL,
+                0
+        );
+#if FIFO_USE_LOCK_SAFE
+        RingFifo_UnLock(fifo);
+#endif
         return;
     }
 
-    // 2. 只有动态申请的（整页）才需要释放
-    if (fifo->is_dynamic == true && fifo->buf != NULL)
-    {
-        mem_pool_free_page(pool, fifo->buf);
+    // 2. 销毁内存池
+    mem_pool_destroy(pool);
 
-        fifo->buf = NULL; // 指针清空，防止野指针
-    }
-
-    // 3. 清空整个FIFO结构体（专业必备）
+    // 3. 清空整个FIFO结构体
     memset(fifo, 0, sizeof(RingFifo_t));
+
+    RingFifo_TriggerCb(
+            EVENT_FIFO_DEINIT,
+            OPERATE_SUCCESS,
+            NULL,
+            0
+    );
+#if FIFO_USE_LOCK_SAFE
+    RingFifo_UnLock(fifo);
+#endif
 }
 
-//基础读写接口
+// 清空FIFO(不清内存，只清空结构体)
+void RingFifo_Clear(RingFifo_t *fifo) {
+#if FIFO_USE_LOCK_SAFE
+    RingFifo_Lock(fifo);
+#endif
+    if (fifo == NULL) {
+#if FIFO_USE_LOCK_SAFE
+        RingFifo_UnLock(fifo);
+#endif
+        return;
+    }
+
+    fifo->buf = NULL;
+    fifo->wr_idx = 0;
+    fifo->rd_idx = 0;
+#if FIFO_USE_DATA_COUNT
+    fifo->data_cnt = 0;
+#endif
+#if FIFO_USE_LOCK_SAFE
+    fifo->lock_flag = FALSE;
+#endif
+    fifo->is_dynamic = FALSE;
+
+    RingFifo_TriggerCb(
+            EVENT_FIFO_CLEAR,
+            OPERATE_SUCCESS,
+            fifo,
+            sizeof(RingFifo_t)
+    );
+#if FIFO_USE_LOCK_SAFE
+    RingFifo_UnLock(fifo);
+#endif
+}
+
+// 基础读写接口
 // 写入单个元素
 EventCb_Type RingFifo_WriteOne(RingFifo_t *fifo, const void *p_data) {
     // 上锁
@@ -104,7 +202,16 @@ EventCb_Type RingFifo_WriteOne(RingFifo_t *fifo, const void *p_data) {
     // 1. 空指针校验
     if (fifo == NULL || p_data == NULL || fifo->buf == NULL)
     {
-        return FIFO_ERR_PARAM;
+        RingFifo_TriggerCb(
+                EVENT_FIFO_WRITE_ONE_FULL,
+                PARA_INVALID,
+                NULL,
+                0
+        );
+#if FIFO_USE_LOCK_SAFE
+        RingFifo_UnLock(fifo);
+#endif
+        return EVENT_FIFO_INIT_FAILED;
     }
 
     // 2. 判断FIFO是否已满
@@ -112,27 +219,25 @@ EventCb_Type RingFifo_WriteOne(RingFifo_t *fifo, const void *p_data) {
     // 计数模式下：直接用data_cnt判满
     if (fifo->data_cnt >= fifo->capacity)
     {
-        EventCb_TriggerSimple(
-                FIFO_ERR_FULL,
+        RingFifo_TriggerCb(
+                EVENT_FIFO_WRITE_ONE_FULL,
                 MEM_OVERFLOW,
                 fifo,
-                sizeof(RingFifo_t),
-                MODULE_FIFO
+                sizeof(RingFifo_t)
         );
-        return FIFO_ERR_FULL;
+        return EVENT_FIFO_WRITE_ONE_FULL;
     }
 #else
     // 无计数模式下：用读写指针判满（写指针追上读指针）
     if ((fifo->wr_idx + 1) % fifo->capacity == fifo->rd_idx)
     {
-        EventCb_TriggerSimple(
-                FIFO_ERR_FULL,
+        RingFifo_TriggerCb(
+                EVENT_FIFO_WRITE_ONE_FULL,
                 MEM_OVERFLOW,
                 fifo,
-                sizeof(RingFifo_t),
-                MODULE_FIFO
+                sizeof(RingFifo_t)
         );
-        return FIFO_FULL;
+        return EVENT_FIFO_WRITE_ONE_FULL;
     }
 #endif
 
@@ -158,14 +263,13 @@ EventCb_Type RingFifo_WriteOne(RingFifo_t *fifo, const void *p_data) {
 #endif
 
     // 7. 写入成功
-    EventCb_TriggerSimple(
-            FIFO_OK,
+    RingFifo_TriggerCb(
+            EVENT_FIFO_WRITE_ONE_OK,
             OPERATE_SUCCESS,
             fifo,
-            sizeof(RingFifo_t),
-            MODULE_FIFO
+            sizeof(RingFifo_t)
     );
-    return FIFO_OK;
+    return EVENT_FIFO_WRITE_ONE_OK;
 }
 
 
@@ -179,34 +283,41 @@ EventCb_Type RingFifo_ReadOne(RingFifo_t *fifo, void *p_data) {
     // 1. 入参合法性校验
     if (fifo == NULL || p_data == NULL || fifo->buf == NULL)
     {
-        return FIFO_ERR_PARAM;
+        RingFifo_TriggerCb(
+                EVENT_FIFO_READ_ONE_EMPTY,
+                PARA_INVALID,
+                NULL,
+                0
+        );
+#if FIFO_USE_LOCK_SAFE
+        RingFifo_UnLock(fifo);
+#endif
+        return EVENT_FIFO_INIT_FAILED;
     }
 
 #if FIFO_USE_DATA_COUNT
     // 计数模式下：直接用data_cnt判空
     if (fifo->data_cnt == 0)
     {
-        EventCb_TriggerSimple(
-                FIFO_ERR_EMPTY,
+        RingFifo_TriggerCb(
+                EVENT_FIFO_READ_ONE_EMPTY,
                 EMPTY,
                 fifo,
-                sizeof(RingFifo_t),
-                MODULE_FIFO
+                sizeof(RingFifo_t)
         );
-        return FIFO_ERR_EMPTY;
+        return EVENT_FIFO_READ_ONE_EMPTY;
     }
 #else
     // 无计数模式下：用读写指针判空
     if (fifo->wr_idx == fifo->rd_idx)
     {
-        EventCb_TriggerSimple(
-                FIFO_ERR_EMPTY,
+        RingFifo_TriggerCb(
+                EVENT_FIFO_READ_ONE_EMPTY,
                 EMPTY,
                 fifo,
-                sizeof(RingFifo_t),
-                MODULE_FIFO
+                sizeof(RingFifo_t)
         );
-        return FIFO_EMPTY;
+        return EVENT_FIFO_READ_ONE_EMPTY;
     }
 #endif
 
@@ -231,14 +342,13 @@ EventCb_Type RingFifo_ReadOne(RingFifo_t *fifo, void *p_data) {
 #endif
 
     // 5. 读取成功
-    EventCb_TriggerSimple(
-            FIFO_OK,
+    RingFifo_TriggerCb(
+            EVENT_FIFO_READ_ONE_OK,
             OPERATE_SUCCESS,
             fifo,
-            sizeof(RingFifo_t),
-            MODULE_FIFO
+            sizeof(RingFifo_t)
     );
-    return FIFO_OK;
+    return EVENT_FIFO_READ_ONE_OK;
 }
 
 
@@ -247,34 +357,32 @@ EventCb_Type RingFifo_PeekOne(const RingFifo_t *fifo, void *p_data) {
     // 1. 入参合法性校验
     if (fifo == NULL || p_data == NULL || fifo->buf == NULL)
     {
-        return FIFO_ERR_PARAM;
+        return EVENT_FIFO_INIT_FAILED;
     }
 
 #if FIFO_USE_DATA_COUNT
     // 计数模式下：判空
     if (fifo->data_cnt == 0)
     {
-        EventCb_TriggerSimple(
-                FIFO_ERR_EMPTY,
+        RingFifo_TriggerCb(
+                EVENT_FIFO_READ_ONE_EMPTY,
                 EMPTY,
                 (void*)fifo,
-                sizeof(RingFifo_t),
-                MODULE_FIFO
+                sizeof(RingFifo_t)
         );
-        return FIFO_ERR_EMPTY;
+        return EVENT_FIFO_READ_ONE_EMPTY;
     }
 #else
     // 无计数模式下：判空
     if (fifo->wr_idx == fifo->rd_idx)
     {
-        EventCb_TriggerSimple(
-                FIFO_ERR_EMPTY,
+        RingFifo_TriggerCb(
+                EVENT_FIFO_READ_ONE_EMPTY,
                 EMPTY,
                 (void *)fifo,
-                sizeof(RingFifo_t),
-                MODULE_FIFO
+                sizeof(RingFifo_t)
         );
-        return FIFO_EMPTY;
+        return EVENT_FIFO_READ_ONE_EMPTY;
     }
 #endif
 
@@ -285,7 +393,7 @@ EventCb_Type RingFifo_PeekOne(const RingFifo_t *fifo, void *p_data) {
     // 3. 拷贝数据到用户缓冲区
     memcpy(p_data, src_addr, fifo->elem_size);
 
-    return FIFO_OK;
+    return EVENT_FIFO_READ_ONE_OK;
 }
 
 //批量高速读写
@@ -297,6 +405,15 @@ uint32_t RingFifo_WriteBatch(RingFifo_t *fifo, const void *p_src, uint32_t len) 
 #endif
     if (fifo == NULL || p_src == NULL || fifo->buf == NULL || len == 0)
     {
+        RingFifo_TriggerCb(
+                EVENT_FIFO_WRITE_BATCH_FULL,
+                PARA_INVALID,
+                NULL,
+                0
+        );
+#if FIFO_USE_LOCK_SAFE
+        RingFifo_UnLock(fifo);
+#endif
         return 0;
     }
 
@@ -322,18 +439,21 @@ uint32_t RingFifo_WriteBatch(RingFifo_t *fifo, const void *p_src, uint32_t len) 
 
     if (available == 0)
     {
-        EventCb_TriggerSimple(
-                FIFO_ERR_FULL,
+        RingFifo_TriggerCb(
+                EVENT_FIFO_WRITE_BATCH_FULL,
                 MEM_OVERFLOW,
                 fifo,
-                sizeof(RingFifo_t),
-                MODULE_FIFO
+                sizeof(RingFifo_t)
         );
         return 0;
     }
 
     // 实际写入的元素数，取请求长度和可用空间的最小值
     write_cnt = MIN(len, available);
+
+    // 判断是全部写入还是部分写入
+    uint32_t event = (write_cnt == len) ? EVENT_FIFO_WRITE_BATCH_OK : EVENT_FIFO_WRITE_BATCH_PARTIAL;
+    uint32_t status = (write_cnt == len) ? OPERATE_SUCCESS : OPERATE_PARTIAL;
 
     // 计算写指针到缓冲区末尾能连续写多少个元素
     uint32_t tail_cnt = fifo->capacity - fifo->wr_idx;
@@ -367,12 +487,11 @@ uint32_t RingFifo_WriteBatch(RingFifo_t *fifo, const void *p_src, uint32_t len) 
     RingFifo_UnLock(fifo);
 #endif
 
-    EventCb_TriggerSimple(
-            FIFO_OK,
-            OPERATE_SUCCESS,
+    RingFifo_TriggerCb(
+            event,
+            status,
             fifo,
-            sizeof(RingFifo_t),
-            MODULE_FIFO
+            sizeof(RingFifo_t)
     );
     return write_cnt;
 }
@@ -385,6 +504,15 @@ uint32_t RingFifo_ReadBatch(RingFifo_t *fifo, void *p_dst, uint32_t len) {
 #endif
     if (fifo == NULL || p_dst == NULL || fifo->buf == NULL || len == 0)
     {
+        RingFifo_TriggerCb(
+                EVENT_FIFO_READ_BATCH_EMPTY,
+                PARA_INVALID,
+                NULL,
+                0
+        );
+#if FIFO_USE_LOCK_SAFE
+        RingFifo_UnLock(fifo);
+#endif
         return 0;
     }
 
@@ -410,18 +538,21 @@ uint32_t RingFifo_ReadBatch(RingFifo_t *fifo, void *p_dst, uint32_t len) {
 
     if (available == 0)
     {
-        EventCb_TriggerSimple(
-                FIFO_ERR_EMPTY,
+        RingFifo_TriggerCb(
+                EVENT_FIFO_READ_BATCH_EMPTY,
                 EMPTY,
                 fifo,
-                sizeof(RingFifo_t),
-                MODULE_FIFO
+                sizeof(RingFifo_t)
         );
         return 0;
     }
 
     // 实际读取的元素数，取请求长度和可用数据量的最小值
     read_cnt = MIN(len, available);
+
+    // 判断是全部读取还是部分读取
+    uint32_t event = (read_cnt == len) ? EVENT_FIFO_READ_BATCH_OK : EVENT_FIFO_READ_BATCH_PARTIAL;
+    uint32_t status = (read_cnt == len) ? OPERATE_SUCCESS : OPERATE_PARTIAL;
 
     // 计算读指针到缓冲区末尾能连续读多少个元素
     uint32_t tail_cnt = fifo->capacity - fifo->rd_idx;
@@ -455,12 +586,11 @@ uint32_t RingFifo_ReadBatch(RingFifo_t *fifo, void *p_dst, uint32_t len) {
     RingFifo_UnLock(fifo);
 #endif
 
-    EventCb_TriggerSimple(
-            FIFO_OK,
-            OPERATE_SUCCESS,
+    RingFifo_TriggerCb(
+            event,
+            status,
             fifo,
-            sizeof(RingFifo_t),
-            MODULE_FIFO
+            sizeof(RingFifo_t)
     );
     return read_cnt;
 }
@@ -493,12 +623,11 @@ uint32_t RingFifo_PeekBatch(const RingFifo_t *fifo, void *p_dst, uint32_t len)
 
     if (available == 0)
     {
-        EventCb_TriggerSimple(
-                FIFO_ERR_EMPTY,
+        RingFifo_TriggerCb(
+                EVENT_FIFO_READ_BATCH_EMPTY,
                 EMPTY,
                 (void *)fifo,
-                sizeof(RingFifo_t),
-                MODULE_FIFO
+                sizeof(RingFifo_t)
         );
         return 0;
     }
@@ -535,6 +664,15 @@ uint32_t RingFifo_DiscardData(RingFifo_t *fifo, uint32_t discard_len) {
 #endif
     if (fifo == NULL || discard_len == 0)
     {
+        RingFifo_TriggerCb(
+                EVENT_FIFO_READ_BATCH_EMPTY,
+                PARA_INVALID,
+                NULL,
+                0
+        );
+#if FIFO_USE_LOCK_SAFE
+        RingFifo_UnLock(fifo);
+#endif
         return 0;
     }
 
@@ -558,6 +696,12 @@ uint32_t RingFifo_DiscardData(RingFifo_t *fifo, uint32_t discard_len) {
 
     if (available == 0)
     {
+        RingFifo_TriggerCb(
+                EVENT_FIFO_READ_BATCH_EMPTY,
+                EMPTY,
+                fifo,
+                sizeof(RingFifo_t)
+        );
         return 0;
     }
 
@@ -572,15 +716,27 @@ uint32_t RingFifo_DiscardData(RingFifo_t *fifo, uint32_t discard_len) {
     fifo->data_cnt -= discard_cnt;
 #endif
 
+    // 解锁
+#if FIFO_USE_LOCK_SAFE
+    RingFifo_UnLock(fifo);
+#endif
+
+    RingFifo_TriggerCb(
+            EVENT_FIFO_READ_BATCH_OK,
+            OPERATE_SUCCESS,
+            fifo,
+            sizeof(RingFifo_t)
+    );
+
     return discard_cnt;
 }
 
 //状态查询
 // 判断是否为空
-bool RingFifo_IsEmpty(const RingFifo_t *fifo) {
+bool_t RingFifo_IsEmpty(const RingFifo_t *fifo) {
     if (fifo == NULL)
     {
-        return true;
+        return TRUE;
     }
 
 #if FIFO_USE_DATA_COUNT
@@ -593,10 +749,10 @@ bool RingFifo_IsEmpty(const RingFifo_t *fifo) {
 }
 
 // 判断是否已满
-bool RingFifo_IsFull(const RingFifo_t *fifo) {
+bool_t RingFifo_IsFull(const RingFifo_t *fifo) {
     if (fifo == NULL)
     {
-        return false;
+        return FALSE;
     }
 
 #if FIFO_USE_DATA_COUNT

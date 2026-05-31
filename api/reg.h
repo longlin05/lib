@@ -5,6 +5,7 @@
 #define REG_H
 
 #include <stdint.h>
+#include "../app/event_cb.h"
 
 // ===================== 宏定义 =====================
 #define BIT_MASK(pos)        ((pos) < 32U ? (1UL << (pos)) : 0UL)                           //生成位掩码
@@ -49,8 +50,13 @@ typedef struct
     uint32_t     def_val;   //默认值
 } RegConfig_t;
 
+//寄存器事件回调类型
+typedef void (*RegCb_t)(EventCb_Type event, EventCb_Status status, 
+                        const RegConfig_t* data, uint32_t len);
+
 // 功能函数
 void Reg_Init(void);
+void Reg_SetCb(RegCb_t cb);
 uint32_t Reg_Read(RegID_t reg_id);
 uint8_t Reg_SetValue(RegID_t reg_id, uint32_t write_val);
 uint8_t reg_set1(RegID_t reg_id, uint8_t bit_pos);
