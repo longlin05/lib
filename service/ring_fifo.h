@@ -5,11 +5,9 @@
 #ifndef RING_FIFO_H
 #define RING_FIFO_H
 
-#include <stdint.h>
-
+#include "../common/sys_def.h"
 #include "mem_pool.h"
 #include "../common/error_def.h"
-#include "../common/sys_def.h"
 
 // ===================== 功能裁剪配置宏 =====================
 #define FIFO_USE_DYNAMIC_MEM      1   // 1启用动态内存 0仅静态

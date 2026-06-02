@@ -5,7 +5,7 @@
 #ifndef LIB_FRAME_DEF_H
 #define LIB_FRAME_DEF_H
 
-#include <stdint.h>
+#include "sys_def.h"
 
 // ===================== 帧类型枚举 =====================
 

@@ -5,7 +5,7 @@
 #ifndef LIB_SERIAL_DEF_H
 #define LIB_SERIAL_DEF_H
 
-#include <stdint.h>
+#include "sys_def.h"
 
 // ===================== 串口基础配置 =====================
 

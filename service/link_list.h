@@ -5,10 +5,8 @@
 #ifndef LINK_LIST_H
 #define LINK_LIST_H
 
-#include <stdint.h>
-#include "../common/error_def.h"
 #include "../common/sys_def.h"
-
+#include "../common/error_def.h"
 #include "mem_pool.h"
 
 // 通用节点结构体（仅next指针，数据外置）

@@ -1,0 +1,1 @@
+D:\mingw64\mingw64\bin\gcc.exe CMakeFiles/test_serial_monitor.dir/test/test_serial_monitor.c.obj -o test_serial_monitor.exe  lib.lib

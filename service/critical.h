@@ -5,7 +5,7 @@
 #ifndef LIB_CRITICAL_H
 #define LIB_CRITICAL_H
 
-#include <stdint.h>
+#include "../common/sys_def.h"
 
 /**
  * @brief 进入临界区（禁用所有中断）

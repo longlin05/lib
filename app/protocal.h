@@ -5,7 +5,7 @@
 #ifndef LIB_PROTOCAL_H
 #define LIB_PROTOCAL_H
 
-#include <stdint.h>
+#include "../common/sys_def.h"
 #include "../common/frame_def.h"
 
 // ===================== 命令码定义 =====================

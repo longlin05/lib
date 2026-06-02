@@ -5,7 +5,7 @@
 #ifndef LIB_FIELD_PARSER_H
 #define LIB_FIELD_PARSER_H
 
-#include <stdint.h>
+#include "../common/sys_def.h"
 
 // ===================== 字段解析配置 =====================
 

@@ -5,7 +5,7 @@
 #ifndef LIB_CHECK_H
 #define LIB_CHECK_H
 
-#include <stdint.h>
+#include "../common/sys_def.h"
 #include <stddef.h>
 
 /**

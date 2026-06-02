@@ -1,5 +1,4 @@
 #define MEM_POOL_FOR_FIFO
-#include <stdint.h>
 #include <string.h>
 
 #include "ring_fifo.h"

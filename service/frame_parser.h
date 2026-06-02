@@ -5,7 +5,7 @@
 #ifndef LIB_FRAME_PARSER_H
 #define LIB_FRAME_PARSER_H
 
-#include <stdint.h>
+#include "../common/sys_def.h"
 #include "../common/frame_def.h"
 
 /**
@@ -24,13 +24,17 @@ typedef enum {
     FRAME_PARSE_STATE_COMPLETE, // 帧解析完成
 } FrameParseState_e;
 
+// ===================== 缓冲区大小配置 =====================
+
+#define FRAME_BUF_SIZE 256
+
 // ===================== 切帧结构体 =====================
 
 typedef struct {
     FrameParseState_e  state;           // 当前解析状态
     FrameFormat_t      format;          // 帧格式配置
-    uint8_t*           recv_buf_a;     // 接收缓冲区A指针
-    uint8_t*           recv_buf_b;     // 接收缓冲区B指针
+    uint8_t            recv_buf_a[FRAME_BUF_SIZE];  // 接收缓冲区A（实例私有）
+    uint8_t            recv_buf_b[FRAME_BUF_SIZE];  // 接收缓冲区B（实例私有）
     uint8_t*           write_buf;       // 当前写入缓冲区指针
     uint8_t*           output_buf;      // 当前输出缓冲区指针
     uint32_t           buf_idx;         // 当前写入位置

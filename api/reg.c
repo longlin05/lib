@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <stddef.h>
 
 #include "reg.h"
 #include "../common/error_def.h"

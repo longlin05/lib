@@ -5,7 +5,7 @@
 #ifndef LIB_EVENT_CB_H
 #define LIB_EVENT_CB_H
 
-#include <stdint.h>
+#include "../common/sys_def.h"
 #include "../common/error_code.h"
 #include "../common/error_def.h"
 

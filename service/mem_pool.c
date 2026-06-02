@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdint.h>
 
 #include "mem_pool.h"
 #include "../common/error_code.h"

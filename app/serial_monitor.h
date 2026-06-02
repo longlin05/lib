@@ -5,7 +5,7 @@
 #ifndef LIB_SERIAL_MONITOR_H
 #define LIB_SERIAL_MONITOR_H
 
-#include <stdint.h>
+#include "../common/sys_def.h"
 
 #include "../common/serial_def.h"
 #include "../common/frame_def.h"

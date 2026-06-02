@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 #include "event_cb.h"
 
 static EventCb_Handler s_event_cb = NULL;

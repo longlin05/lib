@@ -4,7 +4,7 @@
 #ifndef REG_H
 #define REG_H
 
-#include <stdint.h>
+#include "../common/sys_def.h"
 #include "../app/event_cb.h"
 
 // ===================== 宏定义 =====================

@@ -1,0 +1,315 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineSystem.cmake:205 (message)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      The system is: Windows - 6.2.9200 - AMD64
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler: D:/mingw64/mingw64/bin/gcc.exe 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      1
+      Assembler messages:
+      Fatal error: can't create C:\\Users\\祖龙\\AppData\\Local\\Temp\\ccKf8Yan.o: Permission denied
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler: D:/mingw64/mingw64/bin/gcc.exe 
+      Build flags: 
+      Id flags: -c 
+      
+      The output was:
+      1
+      Assembler messages:
+      Error: can't open C:\\Users\\祖龙\\AppData\\Local\\Temp\\ccnmCG3j.s for reading: Illegal byte sequence
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler: D:/mingw64/mingw64/bin/gcc.exe 
+      Build flags: 
+      Id flags: -Aa 
+      
+      The output was:
+      1
+      <command-line>: error: missing '(' after predicate
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler: D:/mingw64/mingw64/bin/gcc.exe 
+      Build flags: 
+      Id flags: -D__CLASSIC_C__ 
+      
+      The output was:
+      1
+      CMakeCCompilerId.c: In function 'main':
+      CMakeCCompilerId.c:876:5: warning: old-style function definition [-Wold-style-definition]
+        876 | int main(argc, argv) int argc; char *argv[];
+            |     ^~~~
+      Assembler messages:
+      Fatal error: can't create C:\\Users\\祖龙\\AppData\\Local\\Temp\\cccgZLr0.o: Permission denied
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler: D:/mingw64/mingw64/bin/gcc.exe 
+      Build flags: 
+      Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+      
+      The output was:
+      1
+      gcc.exe: warning: '-mcpu=' is deprecated; use '-mtune=' or '-march=' instead
+      gcc.exe: error: unrecognized command-line option '--target=arm-arm-none-eabi'
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler: D:/mingw64/mingw64/bin/gcc.exe 
+      Build flags: 
+      Id flags: -c;-I__does_not_exist__ 
+      
+      The output was:
+      1
+      Assembler messages:
+      Error: can't open C:\\Users\\祖龙\\AppData\\Local\\Temp\\ccD0KEgK.s for reading: Illegal byte sequence
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler: D:/mingw64/mingw64/bin/gcc.exe 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      1
+      Assembler messages:
+      Fatal error: can't create C:\\Users\\祖龙\\AppData\\Local\\Temp\\ccKZ5DuG.o: Permission denied
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler: D:/mingw64/mingw64/bin/gcc.exe 
+      Build flags: 
+      Id flags: -c 
+      
+      The output was:
+      1
+      Assembler messages:
+      Error: can't open C:\\Users\\祖龙\\AppData\\Local\\Temp\\ccXUAUM0.s for reading: Illegal byte sequence
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler: D:/mingw64/mingw64/bin/gcc.exe 
+      Build flags: 
+      Id flags: -Aa 
+      
+      The output was:
+      1
+      <command-line>: error: missing '(' after predicate
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler: D:/mingw64/mingw64/bin/gcc.exe 
+      Build flags: 
+      Id flags: -D__CLASSIC_C__ 
+      
+      The output was:
+      1
+      CMakeCCompilerId.c: In function 'main':
+      CMakeCCompilerId.c:876:5: warning: old-style function definition [-Wold-style-definition]
+        876 | int main(argc, argv) int argc; char *argv[];
+            |     ^~~~
+      Assembler messages:
+      Fatal error: can't create C:\\Users\\祖龙\\AppData\\Local\\Temp\\ccFgsKij.o: Permission denied
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler: D:/mingw64/mingw64/bin/gcc.exe 
+      Build flags: 
+      Id flags: --target=arm-arm-none-eabi;-mcpu=cortex-m3 
+      
+      The output was:
+      1
+      gcc.exe: warning: '-mcpu=' is deprecated; use '-mtune=' or '-march=' instead
+      gcc.exe: error: unrecognized command-line option '--target=arm-arm-none-eabi'
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler: D:/mingw64/mingw64/bin/gcc.exe 
+      Build flags: 
+      Id flags: -c;-I__does_not_exist__ 
+      
+      The output was:
+      1
+      Assembler messages:
+      Error: can't open C:\\Users\\祖龙\\AppData\\Local\\Temp\\ccib0Ndi.s for reading: Illegal byte sequence
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:1284 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:86 (CMAKE_DETERMINE_COMPILER_ID_VENDOR)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+      gcc.exe: fatal error: no input files
+      compilation terminated.
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:1284 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerId.cmake:86 (CMAKE_DETERMINE_COMPILER_ID_VENDOR)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+      gcc.exe: fatal error: no input files
+      compilation terminated.
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    checks:
+      - "Detecting C compiler ABI info"
+    directories:
+      source: "D:/C_Demo/lib/build/CMakeFiles/CMakeScratch/TryCompile-0v0xto"
+      binary: "D:/C_Demo/lib/build/CMakeFiles/CMakeScratch/TryCompile-0v0xto"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: ""
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "CMAKE_C_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'D:/C_Demo/lib/build/CMakeFiles/CMakeScratch/TryCompile-0v0xto'
+        
+        Run Build Command(s): D:/mingw64/mingw64/bin/cmake.exe -E env VERBOSE=1 D:/mingw64/mingw64/bin/mingw32-make.exe -f Makefile cmTC_c6a3d/fast
+        D:/mingw64/mingw64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_c6a3d.dir\\build.make CMakeFiles/cmTC_c6a3d.dir/build
+        mingw32-make[1]: Entering directory 'D:/C_Demo/lib/build/CMakeFiles/CMakeScratch/TryCompile-0v0xto'
+        Building C object CMakeFiles/cmTC_c6a3d.dir/CMakeCCompilerABI.c.obj
+        D:\\mingw64\\mingw64\\bin\\gcc.exe    -o CMakeFiles\\cmTC_c6a3d.dir\\CMakeCCompilerABI.c.obj -c D:\\mingw64\\mingw64\\share\\cmake-4.0\\Modules\\CMakeCCompilerABI.c
+        Linking C executable cmTC_c6a3d.exe
+        D:\\mingw64\\mingw64\\bin\\cmake.exe -E cmake_link_script CMakeFiles\\cmTC_c6a3d.dir\\link.txt --verbose=1
+        D:\\mingw64\\mingw64\\bin\\gcc.exe CMakeFiles/cmTC_c6a3d.dir/CMakeCCompilerABI.c.obj -o cmTC_c6a3d.exe
+        mingw32-make[1]: Leaving directory 'D:/C_Demo/lib/build/CMakeFiles/CMakeScratch/TryCompile-0v0xto'
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeDetermineCompilerABI.cmake:227 (message)"
+      - "D:/mingw64/mingw64/share/cmake-4.0/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Parsed C implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)))("|,| |$)]
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: []
+        implicit fwks: []
+      
+      
+...

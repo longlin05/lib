@@ -4,7 +4,7 @@
 #ifndef LIB_MEM_POOL_H
 #define LIB_MEM_POOL_H
 
-#include <stdint.h>
+#include "../common/sys_def.h"
 
 #ifdef MEM_POOL_FOR_SINGLE_LIST
     #define MEM_POOL_BLOCK_SIZE  8U   
